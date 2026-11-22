@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="artifact-type" content="narrative">
+  <meta name="design-style" content="kiln">
+  <title>生成式 AI 在前端網頁自動化開發的應用｜互動式教學簡報</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;600;700&family=Shippori+Mincho:wght@500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@1.43.0/dist/umd/lucide.min.js"></script>
+
+  <style>
+    :root {
+      color-scheme: light;
+
+      /* Page and surfaces: unbleached linen and river clay (Kiln) */
+      --background: #f4f1ea;
+      --surface-container-low: #ebe6db;
+      --surface-container: #e3ddd0;
+      --surface-container-high: #d9d1c2;
+      --surface-paper-bright: #faf8f4;
+
+      /* Ink */
+      --on-surface: #1c1b18;
+      --on-surface-variant: #5e5a51;
+
+      /* Rules */
+      --outline: #1c1b18;
+      --outline-variant: #d2cbbd;
+
+      /* Accents */
+      --primary: #1c1b18;
+      --on-primary: #f4f1ea;
+      --primary-container: #ebe6db;
+      --on-primary-container: #1c1b18;
+      --secondary: #4a5d46;
+      --tertiary: #9e3b2b;
+      --error: #9e2a22;
+      --on-error: #f4f1ea;
+
+      /* Semantic */
+      --positive: #3e5b3a;
+      --positive-bg: #e2eadf;
+      --warning: #8a6220;
+      --warning-bg: #f1e8d3;
+      --error-bg: #f3e1df;
+
+      /* Data series */
+      --data-1: #4a5d46;
+      --data-2: #9e3b2b;
+      --data-3: #1c1b18;
+      --data-4: #8a6f48;
+      --data-context: #c7bfb0;
+
+      /* Focus */
+      --focus: #9e3b2b;
+
+      /* Fonts */
+      --font-headline: 'Shippori Mincho', 'Noto Sans TC', serif;
+      --font-body: 'Noto Sans TC', sans-serif;
+      --font-label: 'Geist Mono', 'Noto Sans TC', monospace;
+
+      /* Type scale */
+      --display-size: clamp(2rem, 1.35rem + 2.6vw, 3.25rem);
+      --headline-size: clamp(1.5rem, 1.15rem + 1.4vw, 2.25rem);
+      --subhead-size: clamp(1.0625rem, 0.98rem + 0.45vw, 1.3125rem);
+      --body-size: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+      --label-size: clamp(0.75rem, 0.72rem + 0.12vw, 0.8125rem);
+
+      /* Shape */
+      --rounded: 0.125rem;
+      --rounded-lg: 0.125rem;
+
+      /* Spacing scale (4pt base) */
+      --space-xs: 0.25rem;
+      --space-sm: 0.5rem;
+      --space-md: 1rem;
+      --space-lg: 1.5rem;
+      --space-xl: 2.5rem;
+      --space-2xl: 4rem;
+
+      /* Style effects */
+      --rule-sumi-left: 2px solid var(--outline);
+      --rule-sumi: 1px solid var(--outline);
+      --rule-linen: 1px solid var(--outline-variant);
+      --label-tracking: 0.12em;
+
+      /* Motion */
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+      --dur-micro: 120ms;
+      --dur-short: 220ms;
+      --dur-long: 420ms;
+    }
+
+    /* Base reset */
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body {
+      overflow-x: clip;
+      margin: 0;
+      padding: 0;
+      background-color: var(--background);
+      color: var(--on-surface);
+      font-family: var(--font-body);
+      font-size: var(--body-size);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+    header { position: static !important; }
+    button, input, select, textarea {
+      font-family: inherit;
+      font-size: inherit;
+      color: inherit;
+    }
+    :focus-visible {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .page-grid {
+      display: grid;
+      gap: var(--space-lg);
+      padding: var(--space-lg);
+      max-width: 1120px;
+      margin: 0 auto;
+      overflow: hidden;
+    }
+    .page-grid * { min-width: 0; }
+
+    /* Top Handout Folio Bar */
+    .folio-header {
+      border-bottom: var(--rule-sumi);
+      padding-bottom: var(--space-md);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+    }
+    .folio-brand {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    .folio-index {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--secondary);
+      font-weight: 500;
+    }
+    .folio-title-small {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--on-surface);
+    }
+    .folio-controls {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: 0 var(--space-md);
+      border-radius: var(--rounded);
+      border: var(--rule-sumi);
+      background-color: var(--surface-container-low);
+      color: var(--on-surface);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out),
+                  color var(--dur-micro) var(--ease-out),
+                  transform var(--dur-micro) var(--ease-out);
+    }
+    .btn:hover:not(:disabled) {
+      background-color: var(--surface-container-high);
+    }
+    .btn:active:not(:disabled) {
+      transform: translateY(1px);
+    }
+    .btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .btn-primary {
+      background-color: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+    .btn-primary:hover:not(:disabled) {
+      background-color: var(--secondary);
+      border-color: var(--secondary);
+      color: var(--on-primary);
+    }
+    .btn-accent {
+      background-color: var(--tertiary);
+      color: var(--on-primary);
+      border-color: var(--tertiary);
+    }
+    .btn-accent:hover:not(:disabled) {
+      opacity: 0.9;
+      background-color: var(--tertiary);
+    }
+    .btn-sm {
+      min-height: 38px;
+      padding: 0 var(--space-sm);
+      font-size: 0.8125rem;
+    }
+
+    /* Slide Tab Navigation */
+    .slide-tabs-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      padding-bottom: var(--space-md);
+      border-bottom: var(--rule-linen);
+    }
+    .slide-tab {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      min-height: 44px;
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--rounded);
+      border: var(--rule-linen);
+      background-color: var(--surface-paper-bright);
+      color: var(--on-surface-variant);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color var(--dur-micro) var(--ease-out),
+                  border-color var(--dur-micro) var(--ease-out),
+                  color var(--dur-micro) var(--ease-out);
+    }
+    .slide-tab .tab-num {
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+      color: var(--secondary);
+    }
+    .slide-tab:hover {
+      background-color: var(--surface-container-low);
+      border-color: var(--outline);
+      color: var(--on-surface);
+    }
+    .slide-tab.is-active {
+      background-color: var(--primary);
+      color: var(--on-primary);
+      border-color: var(--primary);
+    }
+    .slide-tab.is-active .tab-num {
+      color: var(--surface-container);
+    }
+
+    /* Presentation Stage */
+    .presentation-stage {
+      display: grid;
+      gap: var(--space-xl);
+    }
+    .slide {
+      display: none;
+      animation: fadeSlide var(--dur-long) var(--ease-out);
+    }
+    .slide.is-active {
+      display: grid;
+      gap: var(--space-xl);
+    }
+    body.view-all .slide {
+      display: grid;
+      gap: var(--space-xl);
+      padding-bottom: var(--space-2xl);
+      border-bottom: var(--rule-linen);
+    }
+    body.view-all .slide:last-child {
+      border-bottom: none;
+    }
+    body.view-all .bottom-pager,
+    body.view-all .slide-tabs-nav {
+      display: none;
+    }
+
+    @keyframes fadeSlide {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Slide Title Block with Kiln Vertical Hanko Seal */
+    .slide-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: var(--space-lg);
+      align-items: start;
+      padding-bottom: var(--space-lg);
+      border-bottom: var(--rule-linen);
+    }
+    .kicker {
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      font-weight: 500;
+      color: var(--secondary);
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      margin-bottom: var(--space-xs);
+      display: block;
+    }
+    .kicker-zh {
+      font-family: var(--font-body);
+      font-size: var(--label-size);
+      font-weight: 600;
+      color: var(--secondary);
+      margin-bottom: var(--space-xs);
+      display: block;
+    }
+    .display-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: var(--display-size);
+      line-height: 1.18;
+      margin: 0;
+      color: var(--on-surface);
+    }
+    .section-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: var(--headline-size);
+      line-height: 1.24;
+      margin: 0;
+      color: var(--on-surface);
+    }
+    .subhead-moss {
+      font-family: var(--font-headline);
+      font-weight: 500;
+      font-size: var(--subhead-size);
+      line-height: 1.45;
+      color: var(--secondary);
+      margin: var(--space-sm) 0 0 0;
+    }
+    .lede-prose {
+      max-width: 65ch;
+      color: var(--on-surface);
+      margin: var(--space-md) 0 0 0;
+    }
+
+    /* Vertical Cinnabar Seal Stamp */
+    .seal-stamp {
+      border: 1px solid var(--tertiary);
+      color: var(--tertiary);
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 0.8125rem;
+      padding: 0.5rem 0.375rem;
+      writing-mode: vertical-rl;
+      letter-spacing: 0.12em;
+      user-select: none;
+      line-height: 1.2;
+      background-color: var(--surface-paper-bright);
+    }
+
+    /* Washi Cards (Kiln defining treatment) */
+    .washi-card {
+      background-color: var(--surface-container-low);
+      border-left: var(--rule-sumi-left);
+      border-radius: var(--rounded);
+      padding: var(--space-lg);
+      display: grid;
+      gap: var(--space-sm);
+    }
+    .washi-card-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1.1875rem;
+      margin: 0;
+      color: var(--on-surface);
+    }
+    .washi-card-note {
+      color: var(--secondary);
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+    .washi-card p {
+      margin: 0;
+    }
+
+    /* Paper Frame Panel */
+    .paper-panel {
+      background-color: var(--surface-paper-bright);
+      border: var(--rule-linen);
+      border-radius: var(--rounded);
+      padding: var(--space-lg);
+      display: grid;
+      gap: var(--space-md);
+    }
+
+    /* Adaptive Layouts */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+      gap: var(--space-lg);
+    }
+    .split-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      gap: var(--space-lg);
+      align-items: start;
+    }
+    .equal-split {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-lg);
+      align-items: start;
+    }
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+      gap: var(--space-md);
+    }
+    .roadmap-card {
+      background-color: var(--surface-container-low);
+      border-left: var(--rule-sumi-left);
+      border-radius: var(--rounded);
+      padding: var(--space-md) var(--space-lg);
+      text-align: left;
+      cursor: pointer;
+      border-top: none;
+      border-right: none;
+      border-bottom: none;
+      display: grid;
+      gap: var(--space-xs);
+      transition: background-color var(--dur-short) var(--ease-out),
+                  transform var(--dur-short) var(--ease-out);
+    }
+    .roadmap-card:hover {
+      background-color: var(--surface-container);
+      transform: translateX(3px);
+    }
+    .roadmap-card .rc-num {
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+      letter-spacing: var(--label-tracking);
+      color: var(--tertiary);
+      font-weight: 500;
+    }
+    .roadmap-card .rc-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1.125rem;
+      color: var(--on-surface);
+    }
+    .roadmap-card .rc-desc {
+      font-size: 0.875rem;
+      color: var(--on-surface-variant);
+    }
+
+    /* Callout Quote / Principle */
+    .principle-band {
+      background-color: var(--surface-container);
+      padding: var(--space-md) var(--space-lg);
+      border-radius: var(--rounded);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+    }
+    .principle-badge {
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: var(--label-tracking);
+      background-color: var(--primary);
+      color: var(--on-primary);
+      padding: 0.25rem 0.5rem;
+      border-radius: var(--rounded);
+      white-space: nowrap;
+      margin-top: 0.15rem;
+    }
+
+    /* Code Blocks */
+    .code-box {
+      background-color: var(--surface-container);
+      border: var(--rule-linen);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      font-family: var(--font-label);
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--on-surface);
+      margin: 0;
+    }
+
+    /* Interactive Container Wrapper */
+    .interactive-studio {
+      container-type: inline-size;
+      background-color: var(--surface-paper-bright);
+      border: var(--rule-sumi);
+      border-radius: var(--rounded);
+      padding: var(--space-lg);
+      display: grid;
+      gap: var(--space-lg);
+    }
+    .studio-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-sm);
+      padding-bottom: var(--space-sm);
+      border-bottom: var(--rule-linen);
+    }
+    .studio-title {
+      font-family: var(--font-headline);
+      font-weight: 600;
+      font-size: 1.125rem;
+      margin: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .studio-tag {
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+      letter-spacing: var(--label-tracking);
+      text-transform: uppercase;
+      color: var(--secondary);
+      background-color: var(--surface-container-low);
+      border: var(--rule-linen);
+      padding: 0.2rem 0.5rem;
+      border-radius: var(--rounded);
+    }
+
+    /* Form Controls with Always-Visible Labels */
+    .field-group {
+      display: grid;
+      gap: var(--space-xs);
+    }
+    .field-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--on-surface);
+    }
+    .text-area-code {
+      width: 100%;
+      min-height: 220px;
+      padding: var(--space-md);
+      border: var(--rule-sumi);
+      border-radius: var(--rounded);
+      background-color: var(--surface-container-low);
+      font-family: var(--font-label);
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      resize: vertical;
+    }
+    .select-input {
+      min-height: 44px;
+      padding: 0 var(--space-xl) 0 var(--space-md);
+      border: var(--rule-sumi);
+      border-radius: var(--rounded);
+      background-color: var(--surface-paper-bright);
+      cursor: pointer;
+    }
+
+    /* Unit 1 Preview Card */
+    .token-preview-stage {
+      border: var(--rule-linen);
+      border-radius: var(--rounded);
+      padding: var(--space-lg);
+      display: grid;
+      gap: var(--space-md);
+      transition: background-color var(--dur-short) var(--ease-out);
+    }
+    .token-preview-stage.theme-washi {
+      background-color: var(--background);
+      color: var(--on-surface);
+    }
+    .token-preview-stage.theme-moss {
+      background-color: var(--positive-bg);
+      color: var(--on-surface);
+    }
+    .token-preview-stage.theme-sumi {
+      background-color: var(--on-surface);
+      color: var(--background);
+    }
+    .token-preview-card {
+      padding: var(--space-md);
+      border-left: 3px solid var(--tertiary);
+      background-color: var(--surface-container-low);
+      color: var(--on-surface);
+      display: grid;
+      gap: var(--space-xs);
+    }
+    .token-preview-stage.theme-sumi .token-preview-card {
+      background-color: var(--on-surface-variant);
+      color: var(--background);
+      border-left-color: var(--surface-container);
+    }
+    .token-swatch-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: var(--space-sm);
+    }
+    .swatch-chip {
+      border: var(--rule-linen);
+      border-radius: var(--rounded);
+      padding: var(--space-sm);
+      background-color: var(--surface-paper-bright);
+      display: grid;
+      gap: 4px;
+    }
+    .swatch-bar {
+      height: 22px;
+      border-radius: var(--rounded);
+      border: var(--rule-linen);
+    }
+    .swatch-bg-paper { background-color: var(--background); }
+    .swatch-bg-washi { background-color: var(--surface-container-low); }
+    .swatch-bg-sumi { background-color: var(--on-surface); }
+    .swatch-bg-moss { background-color: var(--secondary); }
+    .swatch-bg-cinnabar { background-color: var(--tertiary); }
+
+    /* Unit 2 Mini Presentation Simulator */
+    .mini-browser {
+      border: var(--rule-sumi);
+      border-radius: var(--rounded);
+      background-color: var(--background);
+      overflow: hidden;
+    }
+    .mini-browser-bar {
+      background-color: var(--surface-container);
+      border-bottom: var(--rule-sumi);
+      padding: var(--space-sm) var(--space-md);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+    }
+    .mini-browser-body {
+      padding: var(--space-lg);
+      min-height: 170px;
+      display: grid;
+      align-content: center;
+      gap: var(--space-sm);
+    }
+    .dom-tree-list {
+      display: grid;
+      gap: var(--space-sm);
+      font-family: var(--font-label);
+      font-size: 0.8125rem;
+    }
+    .dom-node {
+      padding: var(--space-sm) var(--space-md);
+      border: var(--rule-linen);
+      border-radius: var(--rounded);
+      background-color: var(--surface-container-low);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+    .dom-node.is-shown {
+      border-left: 3px solid var(--secondary);
+      background-color: var(--positive-bg);
+      font-weight: 500;
+    }
+    .dom-node.is-hidden {
+      opacity: 0.6;
+    }
+
+    /* Unit 3 Workflow Diagram Simulator */
+    .flow-diagram {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+      gap: var(--space-sm);
+      align-items: stretch;
+    }
+    .flow-node {
+      border: var(--rule-linen);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      background-color: var(--surface-container-low);
+      display: grid;
+      gap: var(--space-xs);
+      align-content: start;
+      transition: background-color var(--dur-short) var(--ease-out),
+                  border-color var(--dur-short) var(--ease-out);
+    }
+    .flow-node.node-active {
+      border: 2px solid var(--tertiary);
+      background-color: var(--surface-paper-bright);
+    }
+    .flow-node.node-done {
+      border-left: 3px solid var(--positive);
+      background-color: var(--positive-bg);
+    }
+    .flow-node.node-retry {
+      border: 2px dashed var(--warning);
+      background-color: var(--warning-bg);
+    }
+    .flow-node-id {
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+      color: var(--secondary);
+      text-transform: uppercase;
+    }
+    .flow-node-name {
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }
+    .flow-node-desc {
+      font-size: 0.8125rem;
+      color: var(--on-surface-variant);
+    }
+    .flow-log {
+      background-color: var(--surface-container);
+      border-left: var(--rule-sumi-left);
+      padding: var(--space-md);
+      font-size: 0.9375rem;
+      border-radius: var(--rounded);
+    }
+
+    /* Unit 4 Markdown Preview Output */
+    .md-rendered-output {
+      border: var(--rule-linen);
+      border-radius: var(--rounded);
+      background-color: var(--background);
+      padding: var(--space-lg);
+      min-height: 220px;
+      display: grid;
+      gap: var(--space-sm);
+      align-content: start;
+    }
+    .md-rendered-output h1 {
+      font-family: var(--font-headline);
+      font-size: 1.5rem;
+      margin: 0;
+      padding-bottom: var(--space-xs);
+      border-bottom: var(--rule-sumi);
+    }
+    .md-rendered-output h2 {
+      font-family: var(--font-headline);
+      font-size: 1.2rem;
+      color: var(--secondary);
+      margin: var(--space-xs) 0 0 0;
+    }
+    .md-rendered-output p {
+      margin: 0;
+    }
+    .md-rendered-output ul {
+      margin: 0;
+      padding-left: 1.25rem;
+    }
+    .md-rendered-output blockquote {
+      margin: 0;
+      padding: var(--space-sm) var(--space-md);
+      border-left: var(--rule-sumi-left);
+      background-color: var(--surface-container-low);
+    }
+    .md-rendered-output code {
+      font-family: var(--font-label);
+      background-color: var(--surface-container);
+      padding: 0.1rem 0.35rem;
+      border-radius: var(--rounded);
+      font-size: 0.85em;
+    }
+    .md-wiki-link {
+      font-family: var(--font-label);
+      color: var(--tertiary);
+      border-bottom: 1px dashed var(--tertiary);
+      padding: 0 2px;
+    }
+
+    /* Unit 5 Validation Report */
+    .lint-report {
+      display: grid;
+      gap: var(--space-sm);
+    }
+    .lint-item {
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      display: grid;
+      gap: var(--space-xs);
+      border-left: 3px solid var(--outline);
+      background-color: var(--surface-container-low);
+    }
+    .lint-item.sev-error {
+      border-left-color: var(--error);
+      background-color: var(--error-bg);
+    }
+    .lint-item.sev-warn {
+      border-left-color: var(--warning);
+      background-color: var(--warning-bg);
+    }
+    .lint-item.sev-pass {
+      border-left-color: var(--positive);
+      background-color: var(--positive-bg);
+    }
+    .lint-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--space-sm);
+      font-weight: 600;
+      font-size: 0.9375rem;
+    }
+    .lint-code {
+      font-family: var(--font-label);
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* Tables (Kiln spec: 1px sumi rule above/below header, linen rules between rows) */
+    .kiln-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9375rem;
+    }
+    .kiln-table th {
+      text-align: left;
+      padding: var(--space-sm) var(--space-md);
+      border-top: var(--rule-sumi);
+      border-bottom: var(--rule-sumi);
+      font-family: var(--font-label);
+      font-size: var(--label-size);
+      color: var(--secondary);
+      font-weight: 500;
+    }
+    .kiln-table td {
+      padding: var(--space-sm) var(--space-md);
+      border-bottom: var(--rule-linen);
+      vertical-align: top;
+    }
+
+    /* Bottom Pager */
+    .bottom-pager {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-md);
+      padding-top: var(--space-lg);
+      border-top: var(--rule-sumi);
+    }
+    .pager-meta {
+      font-family: var(--font-label);
+      font-size: 0.8125rem;
+      color: var(--on-surface-variant);
+    }
+
+    /* Footer Colophon */
+    .colophon {
+      padding-top: var(--space-md);
+      border-top: var(--rule-linen);
+      font-size: 0.8125rem;
+      color: var(--on-surface-variant);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: var(--space-sm);
+    }
+
+    /* Container & Media Responsive */
+    @container (max-width: 680px) {
+      .split-grid, .equal-split {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 780px) {
+      .split-grid, .equal-split {
+        grid-template-columns: 1fr;
+      }
+    }
+    @media (max-width: 640px) {
+      .page-grid {
+        padding: var(--space-md);
+        gap: var(--space-md);
+      }
+      .slide-hero {
+        grid-template-columns: 1fr;
+      }
+      .seal-stamp {
+        writing-mode: horizontal-tb;
+        justify-self: start;
+      }
+      .folio-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-grid">
+    <!-- Top Folio Header -->
+    <header class="folio-header">
+      <div class="folio-brand">
+        <span class="folio-index">FOLIO NO. 10 / 2026</span>
+        <span class="folio-title-small">生成式 AI 前端自動化開發講義</span>
+      </div>
+      <div class="folio-controls">
+        <span class="pager-meta" id="top-progress">第 01 / 06 頁</span>
+        <button type="button" class="btn btn-sm" id="btn-toggle-view" onclick="toggleViewMode()">
+          <i data-lucide="scroll-text" aria-hidden="true"></i>
+          <span id="view-mode-label">切換為全覽講義</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Slide Switcher Tabs -->
+    <nav class="slide-tabs-nav" aria-label="簡報單元導覽">
+      <button type="button" class="slide-tab is-active" data-slide-btn="0" onclick="goToSlide(0)">
+        <span class="tab-num">00</span>
+        <span>課程導論</span>
+      </button>
+      <button type="button" class="slide-tab" data-slide-btn="1" onclick="goToSlide(1)">
+        <span class="tab-num">01</span>
+        <span>Design Tokens</span>
+      </button>
+      <button type="button" class="slide-tab" data-slide-btn="2" onclick="goToSlide(2)">
+        <span class="tab-num">02</span>
+        <span>單頁簡報架構</span>
+      </button>
+      <button type="button" class="slide-tab" data-slide-btn="3" onclick="goToSlide(3)">
+        <span class="tab-num">03</span>
+        <span>Vibe Coding</span>
+      </button>
+      <button type="button" class="slide-tab" data-slide-btn="4" onclick="goToSlide(4)">
+        <span class="tab-num">04</span>
+        <span>Markdown 渲染</span>
+      </button>
+      <button type="button" class="slide-tab" data-slide-btn="5" onclick="goToSlide(5)">
+        <span class="tab-num">05</span>
+        <span>語法與路徑檢查</span>
+      </button>
+    </nav>
+
+    <!-- Main Presentation Stage -->
+    <main class="presentation-stage" id="presentation-stage">
+
+      <!-- SLIDE 0: Cover & Overview -->
+      <section class="slide is-active" data-slide="0" aria-label="課程導論">
+        <div class="slide-hero">
+          <div>
+            <span class="kicker">UNIT 00 · CURRICULUM OVERVIEW</span>
+            <h1 class="display-title">生成式 AI 在前端網頁<br>自動化開發的應用</h1>
+            <p class="subhead-moss">把你的工作拆成 AI 能做的流程：從知識庫到互動式單頁簡報</p>
+            <p class="lede-prose">
+              在 AI 代理（AI Agent）時代，初學者不需要手刻每一行繁瑣的 CSS 與 HTML，而是學習當一位「懂流程的專案設計師」。透過明確的視覺規範、結構化的 Markdown 知識庫，以及帶有自我檢查機制的自動化工作流，你就能指揮 Code Agent 穩定產出高品質的前端教學簡報。
+            </p>
+          </div>
+          <div class="seal-stamp" aria-hidden="true">講義拾號</div>
+        </div>
+
+        <div class="principle-band">
+          <span class="principle-badge">核心公式</span>
+          <div>
+            <strong>AI Agent ＝ AI 模型（大腦）＋ Harness（工作規範與檢核流程）</strong>
+            <div class="washi-card-note">不要讓 AI 靠猜的做事——把「可修改範圍、命名規則、驗收標準」寫成規格書，這就是前端自動化的起點。</div>
+          </div>
+        </div>
+
+        <div>
+          <span class="kicker">FIVE CORE MODULES · 點選任意單元直接跳轉學習</span>
+          <div class="roadmap-grid">
+            <button type="button" class="roadmap-card" onclick="goToSlide(1)">
+              <span class="rc-num">UNIT 01</span>
+              <span class="rc-title">Design Tokens 與 CSS 樣式規範</span>
+              <span class="rc-desc">把「日式簡約」翻譯成顏色與字體變數，防止 AI 每次生出的版面風格走鐘。</span>
+            </button>
+            <button type="button" class="roadmap-card" onclick="goToSlide(2)">
+              <span class="rc-num">UNIT 02</span>
+              <span class="rc-title">Single-Page Presentation 簡報架構</span>
+              <span class="rc-desc">如何把多頁簡報塞進單一 HTML 檔？看懂狀態切換、分頁渲染與一鍵發布的秘密。</span>
+            </button>
+            <button type="button" class="roadmap-card" onclick="goToSlide(3)">
+              <span class="rc-num">UNIT 03</span>
+              <span class="rc-title">Vibe Coding 與 Code Agent 開發模式</span>
+              <span class="rc-desc">先訪談釐清再寫 <code>AGENTS.md</code>，搭配 Loop 迴圈與 Graph 節點拆解工作。</span>
+            </button>
+            <button type="button" class="roadmap-card" onclick="goToSlide(4)">
+              <span class="rc-num">UNIT 04</span>
+              <span class="rc-title">Markdown 轉 HTML 渲染機制</span>
+              <span class="rc-desc">為什麼知識庫與簡報大綱要先用 Markdown 撰寫，再交給渲染引擎轉換成網頁？</span>
+            </button>
+            <button type="button" class="roadmap-card" onclick="goToSlide(5)">
+              <span class="rc-num">UNIT 05</span>
+              <span class="rc-title">自動化語法與相對路徑檢查</span>
+              <span class="rc-desc">避開貼圖破圖、誤交本機預覽網址與語法錯誤，為作品加上最後一道自動防線。</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 1: Unit 1 - Design Tokens & CSS -->
+      <section class="slide" data-slide="1" aria-label="單元一：Design Tokens 與 CSS 樣式規範">
+        <div class="slide-hero">
+          <div>
+            <span class="kicker">UNIT 01 · VISUAL CONSTITUTION</span>
+            <h2 class="section-title">Design Tokens 與 CSS 樣式規範</h2>
+            <p class="subhead-moss">用「具名設計變數」代替模糊形容詞，讓 AI 產出的每一頁風格都完全統一</p>
+          </div>
+          <div class="seal-stamp" aria-hidden="true">壹之章</div>
+        </div>
+
+        <div class="split-grid">
+          <div style="display: grid; gap: var(--space-md);">
+            <div class="washi-card">
+              <h3 class="washi-card-title">為什麼「日系簡約風」不能只靠嘴巴說？</h3>
+              <p>
+                如果你只對 AI 下指令：「幫我做一個可愛或文青的簡報」，AI 每次都會自己猜顏色與字型，第一頁用粉紅、第三頁變成亮藍，這在團隊或跨頁面製作時稱為「風格漂移」。
+              </p>
+              <span class="washi-card-note">解法：先把顏色、字體、間距定義成 CSS 變數（Design Tokens），再寫進 <code>AGENTS.md</code> 憲法中。</span>
+            </div>
+
+            <div class="washi-card">
+              <h3 class="washi-card-title">初學者必懂的三層 Token 分工</h3>
+              <p><strong>1. 底紙與容器層：</strong><code>--background</code>（宣紙底色）與 <code>--surface-container-low</code>（和紙卡片）。</p>
+              <p><strong>2. 墨水與層級層：</strong><code>--on-surface</code>（主文炭墨）與 <code>--on-surface-variant</code>（次要說明）。</p>
+              <p><strong>3. 視覺訊號層：</strong><code>--secondary</code>（苔蘚綠小標）與 <code>--tertiary</code>（硃砂印泥重點，全頁不超過 2%）。</p>
+            </div>
+          </div>
+
+          <div class="interactive-studio">
+            <div class="studio-header">
+              <h3 class="studio-title">
+                <i data-lucide="palette" aria-hidden="true"></i>
+                互動展示：Design Token 即時換裝實驗室
+              </h3>
+              <span class="studio-tag">LIVE CSS VARIABLES</span>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm);">
+              <button type="button" class="btn btn-sm btn-primary" id="theme-btn-washi" onclick="setTokenTheme('washi')">和紙宣墨（預設講義）</button>
+              <button type="button" class="btn btn-sm" id="theme-btn-moss" onclick="setTokenTheme('moss')">苔蘚青瓷（自然筆記）</button>
+              <button type="button" class="btn btn-sm" id="theme-btn-sumi" onclick="setTokenTheme('sumi')">墨漆夜讀（深色投影）</button>
+            </div>
+
+            <div class="token-preview-stage theme-washi" id="token-preview-stage">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="studio-tag" id="preview-theme-tag">THEME: WASHI LINEN</span>
+                <span style="font-family: var(--font-label); font-size: 0.75rem;">--rounded: 2px</span>
+              </div>
+              <div class="token-preview-card">
+                <strong style="font-family: var(--font-headline); font-size: 1.125rem;">AI 自動生成的講義卡片預覽</strong>
+                <span style="font-size: 0.875rem;">無論簡報擴充到第幾頁，只要引用同一份 Token，版面比例與配色就會自動對齊。</span>
+              </div>
+            </div>
+
+            <div class="token-swatch-row">
+              <div class="swatch-chip">
+                <div class="swatch-bar swatch-bg-paper"></div>
+                <span class="lint-code">--background</span>
+              </div>
+              <div class="swatch-chip">
+                <div class="swatch-bar swatch-bg-washi"></div>
+                <span class="lint-code">--surface-low</span>
+              </div>
+              <div class="swatch-chip">
+                <div class="swatch-bar swatch-bg-moss"></div>
+                <span class="lint-code">--secondary</span>
+              </div>
+              <div class="swatch-chip">
+                <div class="swatch-bar swatch-bg-cinnabar"></div>
+                <span class="lint-code">--tertiary</span>
+              </div>
+            </div>
+
+            <pre class="code-box" id="token-code-output">:root {
+  --background: #f4f1ea;            /* 未漂白亞麻紙 */
+  --surface-container-low: #ebe6db; /* 和紙卡片底 */
+  --on-surface: #1c1b18;            /* 炭墨主文字 */
+  --secondary: #4a5d46;             /* 苔蘚綠標籤 */
+  --tertiary: #9e3b2b;              /* 硃砂印泥點綴 */
+}</pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: Unit 2 - Single-Page Presentation Architecture -->
+      <section class="slide" data-slide="2" aria-label="單元二：Single-Page Presentation 簡報架構">
+        <div class="slide-hero">
+          <div>
+            <span class="kicker">UNIT 02 · ARCHITECTURE</span>
+            <h2 class="section-title">Single-Page Presentation 簡報架構</h2>
+            <p class="subhead-moss">一份純 HTML 檔如何變身多頁簡報？掌握「狀態管理」與「分頁渲染」原理</p>
+          </div>
+          <div class="seal-stamp" aria-hidden="true">貳之章</div>
+        </div>
+
+        <div class="split-grid">
+          <div style="display: grid; gap: var(--space-md);">
+            <div class="washi-card">
+              <h3 class="washi-card-title">為什麼自動化簡報偏愛「單一 HTML 檔」？</h3>
+              <p>
+                課程範例中，AI 從知識庫讀取論文並產出一份 HTML 簡報。把結構（HTML）、樣式（CSS）與切換邏輯（JS）合而為一，最大優點是<strong>無需架設伺服器、不依賴外部套件，推上 GitHub Pages 後任何裝置一點即開</strong>。
+              </p>
+            </div>
+
+            <div class="washi-card">
+              <h3 class="washi-card-title">背後的三個核心零件</h3>
+              <p><strong>1. 投影片容器（Sections）：</strong>每個單元都是一個 <code>&lt;section class="slide"&gt;</code>，預設用 CSS <code>display: none</code> 藏起來。</p>
+              <p><strong>2. 頁碼狀態（State）：</strong>JavaScript 用一個變數 <code>currentSlide = 0</code> 記住「讀者現在正在看第幾頁」。</p>
+              <p><strong>3. 切換函式（Controller）：</strong>按下「下一頁」或鍵盤 <code>→</code> 時，移除舊頁的 <code>.is-active</code>，加到新頁上，同時更新進度條。</p>
+            </div>
+          </div>
+
+          <div class="interactive-studio">
+            <div class="studio-header">
+              <h3 class="studio-title">
+                <i data-lucide="layers" aria-hidden="true"></i>
+                互動展示：單頁簡報 DOM 狀態透視鏡
+              </h3>
+              <span class="studio-tag">STATE = <span id="mini-state-readout">0</span></span>
+            </div>
+
+            <div class="mini-browser">
+              <div class="mini-browser-bar">
+                <span>presentation.html（單一檔案）</span>
+                <span id="mini-page-badge">Slide 1 / 3</span>
+              </div>
+              <div class="mini-browser-body" id="mini-browser-screen">
+                <span class="kicker" id="mini-slide-kicker">SLIDE 01</span>
+                <strong style="font-family: var(--font-headline); font-size: 1.25rem;" id="mini-slide-title">封面：為什麼要用 AI 寫簡報？</strong>
+                <p style="margin: 0; font-size: 0.9rem;" id="mini-slide-text">這段文字就住在同一個 HTML 檔案的第一個 section 裡，此刻因擁有 .is-active 類別而顯示。</p>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center;">
+              <button type="button" class="btn btn-sm" id="mini-prev-btn" onclick="stepMiniSlide(-1)">上一頁</button>
+              <button type="button" class="btn btn-sm btn-primary" id="mini-next-btn" onclick="stepMiniSlide(1)">下一頁</button>
+              <span style="font-size: 0.8125rem; color: var(--on-surface-variant);">觀察下方 HTML 節點如何切換顯示狀態：</span>
+            </div>
+
+            <div class="dom-tree-list" id="mini-dom-tree">
+              <div class="dom-node is-shown" data-mini-dom="0">
+                <span>&lt;section class="slide is-active"&gt; 封面頁 &lt;/section&gt;</span>
+                <span>display: grid</span>
+              </div>
+              <div class="dom-node is-hidden" data-mini-dom="1">
+                <span>&lt;section class="slide"&gt; 核心概念 &lt;/section&gt;</span>
+                <span>display: none</span>
+              </div>
+              <div class="dom-node is-hidden" data-mini-dom="2">
+                <span>&lt;section class="slide"&gt; 實戰總結 &lt;/section&gt;</span>
+                <span>display: none</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: Unit 3 - Vibe Coding & Code Agent -->
+      <section class="slide" data-slide="3" aria-label="單元三：Vibe Coding 與 Code Agent 開發模式">
+        <div class="slide-hero">
+          <div>
+            <span class="kicker">UNIT 03 · AGENTIC WORKFLOW</span>
+            <h2 class="section-title">Vibe Coding 與 Code Agent 開發模式</h2>
+            <p class="subhead-moss">用自然語言當老闆，但把流程拆成「討論憲法、Loop 迴圈與 Graph 檢查點」</p>
+          </div>
+          <div class="seal-stamp" aria-hidden="true">參之章</div>
+        </div>
+
+        <div class="card-grid">
+          <div class="washi-card">
+            <span class="kicker">CODE AGENT VS CHATBOT</span>
+            <h3 class="washi-card-title">為什麼需要 Code Agent？</h3>
+            <p>
+              一般聊天機器人只能複製貼上；<strong>Code Agent（如 Antigravity、Claude Code）</strong>能直接讀寫你的專案資料夾、操作終端機預覽，還能用 <strong>Git 版本控制</strong>把每次修改存成歷史紀錄——做壞了隨時退回上一版。
+            </p>
+          </div>
+          <div class="washi-card">
+            <span class="kicker">PROJECT CONSTITUTION</span>
+            <h3 class="washi-card-title">先寫 <code>AGENTS.md</code> 再開工</h3>
+            <p>
+              開新對話視窗時，AI 會忘記之前說過的話。把「資料夾規定、語言風格、哪些檔案不能動」寫進 <code>AGENTS.md</code>（員工手冊），就能確保每次開工都維持一致品質並節省 Token。
+            </p>
+          </div>
+          <div class="washi-card">
+            <span class="kicker">BRAKE &amp; HUMAN GATE</span>
+            <h3 class="washi-card-title">人類檢查點要放在「大綱」</h3>
+            <p>
+              不要等 AI 寫完幾千行 HTML 才來逐頁硬改！把人類審核放在<strong>「簡報大綱」</strong>階段最省力；後面的排版與錯誤修正，交給 AI 自己的迴圈加上「最多重試 3 次」停損點即可。
+            </p>
+          </div>
+        </div>
+
+        <div class="interactive-studio">
+          <div class="studio-header">
+            <h3 class="studio-title">
+              <i data-lucide="git-branch" aria-hidden="true"></i>
+              互動展示：比較三種 AI 開發工作流（點擊步驟體驗流程）
+            </h3>
+            <span class="studio-tag" id="wf-mode-badge">GRAPH WORKFLOW</span>
+          </div>
+
+          <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm);">
+            <button type="button" class="btn btn-sm" id="wf-select-prompt" onclick="selectWorkflow('prompt')">1. 單次模糊 Prompt（常見踩雷）</button>
+            <button type="button" class="btn btn-sm" id="wf-select-loop" onclick="selectWorkflow('loop')">2. Loop 自我審查迴圈</button>
+            <button type="button" class="btn btn-sm btn-primary" id="wf-select-graph" onclick="selectWorkflow('graph')">3. Graph 多節點流程（推薦）</button>
+          </div>
+
+          <div class="flow-diagram" id="wf-diagram">
+            <!-- Populated by JS -->
+          </div>
+
+          <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: center;">
+            <button type="button" class="btn btn-accent btn-sm" onclick="advanceWorkflowStep()">
+              <i data-lucide="play" aria-hidden="true"></i>
+              推進一步模擬
+            </button>
+            <button type="button" class="btn btn-sm" onclick="resetWorkflowStep()">重置流程</button>
+            <span class="pager-meta" id="wf-step-counter">步驟 1 / 5</span>
+          </div>
+
+          <div class="flow-log" id="wf-log-box">
+            點選「推進一步模擬」，觀察 Code Agent 如何依照節點規範執行任務、檢查錯誤並退回重修。
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: Unit 4 - Markdown to HTML Rendering -->
+      <section class="slide" data-slide="4" aria-label="單元四：Markdown 轉 HTML 渲染機制">
+        <div class="slide-hero">
+          <div>
+            <span class="kicker">UNIT 04 · CONTENT PIPELINE</span>
+            <h2 class="section-title">Markdown 轉 HTML 渲染機制</h2>
+            <p class="subhead-moss">用純文字寫內容、交給程式變網頁：LLM Wiki 與教學講義的共同語言</p>
+          </div>
+          <div class="seal-stamp" aria-hidden="true">肆之章</div>
+        </div>
+
+        <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));">
+          <div class="washi-card">
+            <h3 class="washi-card-title">為什麼大家都在寫 <code>.md</code> 檔？</h3>
+            <p>
+              Markdown 用極簡符號標記結構（<code>#</code> 是標題、<code>-</code> 是清單、<code>`程式`</code> 是行內代碼）。比起塞滿 <code>&lt;div&gt;</code> 的 HTML，Markdown 人類看得懂、AI 也不容易寫錯標籤，是 <code>AGENTS.md</code> 與 LLM Wiki 知識庫的標準格式。
+            </p>
+          </div>
+          <div class="washi-card">
+            <h3 class="washi-card-title">轉換三步驟：讀檔 → 解析 → 套版</h3>
+            <p>
+              <strong>Step 1 讀取純文字：</strong>程式逐行讀取 <code>.md</code> 檔案內容。<br>
+              <strong>Step 2 語法解析（Parse）：</strong>比對開頭符號，把 <code># 標題</code> 換成 <code>&lt;h1&gt;標題&lt;/h1&gt;</code>，把 <code>[[連結]]</code> 轉為知識跳轉標籤。<br>
+              <strong>Step 3 套用樣式：</strong>瀏覽器依照 Unit 01 的 CSS Token 上色排版，講義立即誕生。
+            </p>
+          </div>
+        </div>
+
+        <div class="interactive-studio">
+          <div class="studio-header">
+            <h3 class="studio-title">
+              <i data-lucide="file-code-2" aria-hidden="true"></i>
+              互動展示：即時 Markdown → 日式講義 HTML 轉換器
+            </h3>
+            <div style="display: flex; gap: var(--space-xs); flex-wrap: wrap;">
+              <button type="button" class="btn btn-sm" onclick="loadMarkdownPreset('wiki')">範本：LLM Wiki 筆記</button>
+              <button type="button" class="btn btn-sm" onclick="loadMarkdownPreset('agents')">範本：AGENTS.md 規範</button>
+            </div>
+          </div>
+
+          <div class="equal-split">
+            <div class="field-group">
+              <label for="md-source-input" class="field-label">左側編輯區：輸入 Markdown 純文字（試著修改標題或清單）</label>
+              <textarea id="md-source-input" class="text-area-code" oninput="renderMarkdownLive()"># LLM Wiki 知識庫整理筆記
+## 核心觀念
+> Markdown 是給 AI 與人類共同閱讀的純文字橋樑。
+
+- 把原始論文放在 `raw/papers/` 資料夾
+- 用 `[[Design Tokens]]` 建立雙向知識連結
+- 確認大綱無誤後，再生成 **單頁式 HTML 簡報**</textarea>
+            </div>
+
+            <div class="field-group">
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: var(--space-sm);">
+                <span class="field-label">右側預覽區：即時轉換結果</span>
+                <div style="display: flex; gap: var(--space-xs);">
+                  <button type="button" class="btn btn-sm btn-primary" id="md-tab-visual" onclick="setMdOutputMode('visual')">視覺講義畫面</button>
+                  <button type="button" class="btn btn-sm" id="md-tab-html" onclick="setMdOutputMode('html')">HTML 原始碼</button>
+                </div>
+              </div>
+              <div id="md-visual-output" class="md-rendered-output"></div>
+              <pre id="md-html-output" class="code-box" style="display: none; min-height: 220px;"></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: Unit 5 - Syntax & Relative Path Validation -->
+      <section class="slide" data-slide="5" aria-label="單元五：自動化語法與相對路徑檢查">
+        <div class="slide-hero">
+          <div>
+            <span class="kicker">UNIT 05 · QUALITY HARNESS</span>
+            <h2 class="section-title">自動化語法與相對路徑檢查</h2>
+            <p class="subhead-moss">別讓破圖、本機網址與漏寫標籤毀了整份簡報——交付前的最後一道防線</p>
+          </div>
+          <div class="seal-stamp" aria-hidden="true">伍之章</div>
+        </div>
+
+        <div class="split-grid">
+          <div style="display: grid; gap: var(--space-md);">
+            <div class="washi-card">
+              <h3 class="washi-card-title">課堂真實踩雷：為什麼貼圖全部破圖？</h3>
+              <p>
+                在課堂示範中，AI 第一版生出的簡報排版還行，但可愛的貼圖全部顯示失敗——原因正是 <strong>AI 寫錯了圖片的相對路徑</strong>！它可能寫成 <code>C:\Users\demo\pic.png</code>（電腦絕對路徑，別人電腦根本沒有這個路徑），或是漏掉了資料夾前綴 <code>./assets/</code>。
+              </p>
+            </div>
+
+            <table class="kiln-table">
+              <thead>
+                <tr>
+                  <th>常見錯誤類型</th>
+                  <th>錯誤寫法範例</th>
+                  <th>正確與自動化檢查標準</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>路徑寫死</strong></td>
+                  <td><code>C:\Desktop\img.png</code></td>
+                  <td>一律使用相對於專案根目錄的 <code>./assets/img.png</code></td>
+                </tr>
+                <tr>
+                  <td><strong>交錯預覽網址</strong></td>
+                  <td><code>localhost:8000</code></td>
+                  <td>發布前必須推上 GitHub Pages 並用無痕視窗測試</td>
+                </tr>
+                <tr>
+                  <td><strong>語法與資安漏洞</strong></td>
+                  <td>未閉合標籤 / 外洩 Key</td>
+                  <td>驗證成對標籤、JS 函式存在、嚴禁殘留 API Key</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="interactive-studio">
+            <div class="studio-header">
+              <h3 class="studio-title">
+                <i data-lucide="shield-check" aria-hidden="true"></i>
+                互動展示：HTML 語法與相對路徑自動體檢機
+              </h3>
+              <span class="studio-tag">AUTO LINTER</span>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm);">
+              <button type="button" class="btn btn-sm" onclick="loadLintSample('broken_path')">載入踩雷樣本 A（破圖路徑）</button>
+              <button type="button" class="btn btn-sm" onclick="loadLintSample('localhost_leak')">載入踩雷樣本 B（本機網址＋語法錯）</button>
+              <button type="button" class="btn btn-sm" onclick="loadLintSample('clean')">載入標準通過樣本</button>
+            </div>
+
+            <div class="field-group">
+              <label for="lint-code-input" class="field-label">待檢查的專案 HTML 片段（可手動修改測試）</label>
+              <textarea id="lint-code-input" class="text-area-code" style="min-height: 150px;"><section class="slide">
+  <h2>教學簡報範例</h2>
+  <img src="C:\Users\student\Desktop\assets\sticker.png" alt="">
+  <a href="localhost:8000/notes.html">本機預覽連結</a>
+  <p>忘記關閉段落標籤</section></textarea>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm);">
+              <button type="button" class="btn btn-primary btn-sm" onclick="runAutoLinter()">
+                <i data-lucide="scan-line" aria-hidden="true"></i>
+                執行自動化檢查
+              </button>
+              <button type="button" class="btn btn-accent btn-sm" onclick="autoFixLintSample()">
+                <i data-lucide="wrench" aria-hidden="true"></i>
+                一鍵套用自動修復（模擬 Loop）
+              </button>
+            </div>
+
+            <div class="lint-report" id="lint-report-output">
+              <!-- Populated by JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Bottom Slide Pager -->
+    <nav class="bottom-pager" aria-label="簡報頁碼控制">
+      <button type="button" class="btn" id="btn-prev-slide" onclick="stepSlide(-1)">
+        <i data-lucide="arrow-left" aria-hidden="true"></i>
+        <span>上一單元</span>
+      </button>
+      <span class="pager-meta" id="bottom-progress">第 01 / 06 頁｜可用鍵盤 ← → 切換</span>
+      <button type="button" class="btn btn-primary" id="btn-next-slide" onclick="stepSlide(1)">
+        <span>下一單元</span>
+        <i data-lucide="arrow-right" aria-hidden="true"></i>
+      </button>
+    </nav>
+
+    <!-- Colophon -->
+    <footer class="colophon">
+      <span>參考來源：TAICA「生成式 AI：文字與圖像生成的原理與實務」第 10 講課堂實作與助教講義</span>
+      <span>單頁式互動教學簡報｜Kiln 日式簡約講義樣式</span>
+    </footer>
+  </div>
+
+  <script>
+    /* Global Presentation State */
+    const TOTAL_SLIDES = 6;
+    let currentSlide = 0;
+    let isViewAllMode = false;
+
+    const slideMeta = [
+      `課程導論`,
+      `單元一：Design Tokens`,
+      `單元二：單頁簡報架構`,
+      `單元三：Vibe Coding`,
+      `單元四：Markdown 渲染`,
+      `單元五：語法與路徑檢查`
+    ];
+
+    function padZero(num) {
+      return num < 10 ? `0${num}` : `${num}`;
+    }
+
+    function goToSlide(index) {
+      if (index < 0 || index >= TOTAL_SLIDES) return;
+      currentSlide = index;
+
+      const slides = document.querySelectorAll('.slide');
+      slides.forEach((slide, idx) => {
+        if (idx === currentSlide) {
+          slide.classList.add('is-active');
+        } else {
+          slide.classList.remove('is-active');
+        }
+      });
+
+      const tabs = document.querySelectorAll('.slide-tab');
+      tabs.forEach((tab, idx) => {
+        if (idx === currentSlide) {
+          tab.classList.add('is-active');
+          tab.setAttribute('aria-current', 'page');
+        } else {
+          tab.classList.remove('is-active');
+          tab.removeAttribute('aria-current');
+        }
+      });
+
+      const progressText = `第 ${padZero(currentSlide + 1)} / ${padZero(TOTAL_SLIDES)} 頁`;
+      const topProg = document.getElementById('top-progress');
+      if (topProg) topProg.textContent = progressText;
+
+      const bottomProg = document.getElementById('bottom-progress');
+      if (bottomProg) {
+        bottomProg.textContent = `${progressText}｜${slideMeta[currentSlide]}｜鍵盤 ← → 可切換`;
+      }
+
+      const prevBtn = document.getElementById('btn-prev-slide');
+      const nextBtn = document.getElementById('btn-next-slide');
+      if (prevBtn) prevBtn.disabled = currentSlide === 0;
+      if (nextBtn) nextBtn.disabled = currentSlide === TOTAL_SLIDES - 1;
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function stepSlide(delta) {
+      goToSlide(currentSlide + delta);
+    }
+
+    function toggleViewMode() {
+      isViewAllMode = !isViewAllMode;
+      const body = document.body;
+      const label = document.getElementById('view-mode-label');
+      const topProg = document.getElementById('top-progress');
+
+      if (isViewAllMode) {
+        body.classList.add('view-all');
+        if (label) label.textContent = `返回簡報分頁模式`;
+        if (topProg) topProg.textContent = `全覽講義模式（共 06 單元）`;
+      } else {
+        body.classList.remove('view-all');
+        if (label) label.textContent = `切換為全覽講義`;
+        goToSlide(currentSlide);
+      }
+    }
+
+    document.addEventListener('keydown', function (e) {
+      if (isViewAllMode) return;
+      const tag = e.target && e.target.tagName ? e.target.tagName.toLowerCase() : '';
+      if (tag === 'textarea' || tag === 'input' || tag === 'select') return;
+
+      if (e.key === 'ArrowRight') {
+        stepSlide(1);
+      } else if (e.key === 'ArrowLeft') {
+        stepSlide(-1);
+      }
+    });
+
+    /* ============================================================
+       UNIT 1: Design Token Live Theme Switcher
+    ============================================================ */
+    const tokenThemes = {
+      washi: {
+        cls: `theme-washi`,
+        tag: `THEME: WASHI LINEN`,
+        code: `:root {\n  --background: #f4f1ea;            /* 未漂白亞麻紙 */\n  --surface-container-low: #ebe6db; /* 和紙卡片底 */\n  --on-surface: #1c1b18;            /* 炭墨主文字 */\n  --secondary: #4a5d46;             /* 苔蘚綠標籤 */\n  --tertiary: #9e3b2b;              /* 硃砂印泥點綴 */\n}`
+      },
+      moss: {
+        cls: `theme-moss`,
+        tag: `THEME: CELADON MOSS`,
+        code: `:root {\n  --background: #e2eadf;            /* 青瓷苔蘚紙 */\n  --surface-container-low: #ebe6db; /* 暖灰內頁卡片 */\n  --on-surface: #1c1b18;            /* 炭墨主文字 */\n  --secondary: #3e5b3a;             /* 深松綠小標 */\n  --tertiary: #8a6220;              /* 琥珀竹黃點綴 */\n}`
+      },
+      sumi: {
+        cls: `theme-sumi`,
+        tag: `THEME: SUMI LACQUER DARK`,
+        code: `:root {\n  --background: #141412;            /* 墨漆深色底 */\n  --surface-container-low: #1d1c19; /* 暗石卡片底 */\n  --on-surface: #ece7dc;            /* 象牙白文字 */\n  --secondary: #8fb088;             /* 柔苔綠標籤 */\n  --tertiary: #e06d58;              /* 亮硃砂點綴 */\n}`
+      }
+    };
+
+    function setTokenTheme(key) {
+      const data = tokenThemes[key];
+      if (!data) return;
+
+      const stage = document.getElementById('token-preview-stage');
+      if (stage) {
+        stage.className = `token-preview-stage ${data.cls}`;
+      }
+      const tag = document.getElementById('preview-theme-tag');
+      if (tag) tag.textContent = data.tag;
+
+      const codeBox = document.getElementById('token-code-output');
+      if (codeBox) codeBox.textContent = data.code;
+
+      const ids = ['washi', 'moss', 'sumi'];
+      ids.forEach((id) => {
+        const btn = document.getElementById(`theme-btn-${id}`);
+        if (btn) {
+          if (id === key) btn.classList.add('btn-primary');
+          else btn.classList.remove('btn-primary');
+        }
+      });
+    }
+
+    /* ============================================================
+       UNIT 2: Single-Page Presentation State Simulator
+    ============================================================ */
+    let miniIndex = 0;
+    const miniSlidesData = [
+      {
+        kicker: `SLIDE 01`,
+        title: `封面：為什麼要用 AI 寫簡報？`,
+        text: `這段文字就住在同一個 HTML 檔案的第一個 section 裡，此刻因擁有 .is-active 類別而顯示。`
+      },
+      {
+        kicker: `SLIDE 02`,
+        title: `核心概念：一頁式切換的本質`,
+        text: `沒有重新載入網頁！JavaScript 只是把變數改成 1，讓第二個 section 變成 display: grid。`
+      },
+      {
+        kicker: `SLIDE 03`,
+        title: `實戰總結：打包發布零障礙`,
+        text: `因為所有分頁都在同一個檔案內，只要把這份 index.html 放上 GitHub Pages 就能直接分享。`
+      }
+    ];
+
+    function stepMiniSlide(delta) {
+      const next = miniIndex + delta;
+      if (next < 0 || next >= miniSlidesData.length) return;
+      miniIndex = next;
+      updateMiniSlideView();
+    }
+
+    function updateMiniSlideView() {
+      const item = miniSlidesData[miniIndex];
+      const kickerEl = document.getElementById('mini-slide-kicker');
+      const titleEl = document.getElementById('mini-slide-title');
+      const textEl = document.getElementById('mini-slide-text');
+      const badgeEl = document.getElementById('mini-page-badge');
+      const stateEl = document.getElementById('mini-state-readout');
+
+      if (kickerEl) kickerEl.textContent = item.kicker;
+      if (titleEl) titleEl.textContent = item.title;
+      if (textEl) textEl.textContent = item.text;
+      if (badgeEl) badgeEl.textContent = `Slide ${miniIndex + 1} / 3`;
+      if (stateEl) stateEl.textContent = `${miniIndex}`;
+
+      const prevBtn = document.getElementById('mini-prev-btn');
+      const nextBtn = document.getElementById('mini-next-btn');
+      if (prevBtn) prevBtn.disabled = miniIndex === 0;
+      if (nextBtn) nextBtn.disabled = miniIndex === miniSlidesData.length - 1;
+
+      const domNodes = document.querySelectorAll('[data-mini-dom]');
+      const names = [`封面頁`, `核心概念`, `實戰總結`];
+      domNodes.forEach((node, idx) => {
+        if (idx === miniIndex) {
+          node.className = `dom-node is-shown`;
+          node.innerHTML = `<span>&lt;section class="slide is-active"&gt; ${names[idx]} &lt;/section&gt;</span><span>display: grid</span>`;
+        } else {
+          node.className = `dom-node is-hidden`;
+          node.innerHTML = `<span>&lt;section class="slide"&gt; ${names[idx]} &lt;/section&gt;</span><span>display: none</span>`;
+        }
+      });
+    }
+
+    /* ============================================================
+       UNIT 3: Workflow Simulator (Prompt vs Loop vs Graph)
+    ============================================================ */
+    let activeWorkflow = 'graph';
+    let wfStep = 0;
+
+    const workflowConfigs = {
+      prompt: {
+        badge: `SINGLE PROMPT`,
+        nodes: [
+          { id: `STEP 01`, name: `下一句模糊指令`, desc: `「幫我把論文做成 HTML 簡報」` },
+          { id: `STEP 02`, name: `AI 自行猜測產出`, desc: `未經討論與大綱確認，直接生成整份網頁` },
+          { id: `STEP 03`, name: `人類手動反覆重修`, desc: `發現破圖、少重點、風格跑掉，只好人工一句句補救` }
+        ],
+        logs: [
+          `目前位置 [1/3]：使用者直接丟出一句簡短指令，沒有提供規格書與檢查標準。`,
+          `目前位置 [2/3]：AI 開始憑空猜測需求，一次生出大量程式碼，但貼圖路徑與排版都沒檢查。`,
+          `目前位置 [3/3]：結果不如預期！人類被迫進入無止盡的對話修改地獄，耗費大量 Token 與時間。`
+        ]
+      },
+      loop: {
+        badge: `REVIEW LOOP`,
+        nodes: [
+          { id: `NODE A`, name: `讀取規格並草擬`, desc: `依 AGENTS.md 產出初版簡報` },
+          { id: `NODE B`, name: `自動化自我審查`, desc: `檢查字數、引用來源與語法` },
+          { id: `BRAKE`, name: `達標或觸發停損`, desc: `通過才放行；最多重試 3 次避免無限迴圈` }
+        ],
+        logs: [
+          `目前位置 [1/3]：Code Agent 先讀取 AGENTS.md 規範，產出第一版 HTML 簡報。`,
+          `目前位置 [2/3]：進入審查迴圈！AI 自動檢查發現第 2 頁字數過多、引用遺漏，退回 Node A 自動修正。`,
+          `目前位置 [3/3]：第 2 輪審查通過（未超過 3 次停損上限），正式將乾淨成品交給大老闆驗收。`
+        ]
+      },
+      graph: {
+        badge: `GRAPH WORKFLOW`,
+        nodes: [
+          { id: `01 討論`, name: `訪談與憲法`, desc: `先與 AI 討論需求並產出 AGENTS.md` },
+          { id: `02 大綱`, name: `大綱人類把關`, desc: `AI 寫大綱＋自檢，人類在此確認方向` },
+          { id: `03 逐頁`, name: `生成逐頁內容`, desc: `依大綱拆解為結構化 Markdown` },
+          { id: `04 渲染`, name: `套用 Token 成頁`, desc: `轉為統一風格的單頁簡報 HTML` },
+          { id: `05 體檢`, name: `語法與路徑檢查`, desc: `未過關則退回對應節點重修` }
+        ],
+        logs: [
+          `目前位置 [1/5]：先別急著寫網頁！讓 AI 透過選擇題訪談你，共同產出 AGENTS.md 專案憲法。`,
+          `目前位置 [2/5]：關鍵人類檢查點！人類最擅長看大綱——在這裡確認所有重點都沒漏掉，比改成品快十倍。`,
+          `目前位置 [3/5]：大綱定案後全面自動化：AI 依照大綱生成每頁的 Markdown 講稿內容。`,
+          `目前位置 [4/5]：套用 Unit 01 鎖定的 Design Tokens，自動組裝為單頁式互動簡報。`,
+          `目前位置 [5/5]：執行自動化路徑與語法體檢，若有破圖就退回 Node 04 修正，通過後才推送 GitHub。`
+        ]
+      }
+    };
+
+    function selectWorkflow(mode) {
+      if (!workflowConfigs[mode]) return;
+      activeWorkflow = mode;
+      wfStep = 0;
+
+      ['prompt', 'loop', 'graph'].forEach((m) => {
+        const btn = document.getElementById(`wf-select-${m}`);
+        if (btn) {
+          if (m === mode) btn.classList.add('btn-primary');
+          else btn.classList.remove('btn-primary');
+        }
+      });
+
+      renderWorkflowDiagram();
+    }
+
+    function advanceWorkflowStep() {
+      const cfg = workflowConfigs[activeWorkflow];
+      if (!cfg) return;
+      if (wfStep < cfg.nodes.length - 1) {
+        wfStep += 1;
+      } else {
+        wfStep = 0;
+      }
+      renderWorkflowDiagram();
+    }
+
+    function resetWorkflowStep() {
+      wfStep = 0;
+      renderWorkflowDiagram();
+    }
+
+    function renderWorkflowDiagram() {
+      const cfg = workflowConfigs[activeWorkflow];
+      if (!cfg) return;
+
+      const badge = document.getElementById('wf-mode-badge');
+      if (badge) badge.textContent = cfg.badge;
+
+      const diagram = document.getElementById('wf-diagram');
+      if (diagram) {
+        diagram.innerHTML = cfg.nodes.map((node, idx) => {
+          let stateClass = '';
+          if (idx < wfStep) stateClass = 'node-done';
+          else if (idx === wfStep) {
+            stateClass = (activeWorkflow === 'prompt' && idx === 2) ? 'node-retry' : 'node-active';
+          }
+          return `<div class="flow-node ${stateClass}">
+            <span class="flow-node-id">${node.id}</span>
+            <span class="flow-node-name">${node.name}</span>
+            <span class="flow-node-desc">${node.desc}</span>
+          </div>`;
+        }).join('');
+      }
+
+      const counter = document.getElementById('wf-step-counter');
+      if (counter) counter.textContent = `步驟 ${wfStep + 1} / ${cfg.nodes.length}`;
+
+      const logBox = document.getElementById('wf-log-box');
+      if (logBox) logBox.textContent = cfg.logs[wfStep] || '';
+    }
+
+    /* ============================================================
+       UNIT 4: Safe Live Markdown-to-HTML Renderer
+    ============================================================ */
+    let mdOutputMode = 'visual';
+
+    const mdPresets = {
+      wiki: `# LLM Wiki 知識庫整理筆記\n## 核心觀念\n> Markdown 是給 AI 與人類共同閱讀的純文字橋樑。\n\n- 把原始論文放在 \`raw/papers/\` 資料夾\n- 用 \`[[Design Tokens]]\` 建立雙向知識連結\n- 確認大綱無誤後，再生成 **單頁式 HTML 簡報**`,
+      agents: `# AGENTS.md 專案員工手冊\n## 資料夾與修改限制\n> 嚴禁更改 \`assets/\` 內的原始圖片檔名。\n\n- **語言規範**：內文使用繁體中文，專有名詞保留英文\n- **相對路徑**：所有貼圖一律引用 \`./assets/\`\n- **驗收條件**：須通過 \`validate_html\` 語法檢查才可提交`
+    };
+
+    function escapeHtmlStr(str) {
+      return str
+        .replace(/&/g, `&amp;`)
+        .replace(/</g, `&lt;`)
+        .replace(/>/g, `&gt;`)
+        .replace(/"/g, `&quot;`);
+    }
+
+    function formatInlineMd(escapedLine) {
+      let out = escapedLine;
+      out = out.replace(/\[\[([^\]]+)\]\]/g, `<span class="md-wiki-link">[$1]</span>`);
+      out = out.replace(/`([^`]+)`/g, `<code>$1</code>`);
+      out = out.replace(/\*\*([^*]+)\*\*/g, `<strong>$1</strong>`);
+      return out;
+    }
+
+    function parseMarkdownToHtml(rawText) {
+      const lines = rawText.split(/\r?\n/);
+      const htmlParts = [];
+      let inList = false;
+
+      lines.forEach((rawLine) => {
+        const line = rawLine.trim();
+        if (!line) {
+          if (inList) {
+            htmlParts.push(`</ul>`);
+            inList = false;
+          }
+          return;
+        }
+
+        const safe = escapeHtmlStr(line);
+
+        if (safe.startsWith(`- `)) {
+          if (!inList) {
+            htmlParts.push(`<ul>`);
+            inList = true;
+          }
+          htmlParts.push(`  <li>${formatInlineMd(safe.slice(2))}</li>`);
+          return;
+        }
+
+        if (inList) {
+          htmlParts.push(`</ul>`);
+          inList = false;
+        }
+
+        if (safe.startsWith(`# `)) {
+          htmlParts.push(`<h1>${formatInlineMd(safe.slice(2))}</h1>`);
+        } else if (safe.startsWith(`## `)) {
+          htmlParts.push(`<h2>${formatInlineMd(safe.slice(3))}</h2>`);
+        } else if (safe.startsWith(`&gt; `)) {
+          htmlParts.push(`<blockquote>${formatInlineMd(safe.slice(5))}</blockquote>`);
+        } else {
+          htmlParts.push(`<p>${formatInlineMd(safe)}</p>`);
+        }
+      });
+
+      if (inList) htmlParts.push(`</ul>`);
+      return htmlParts.join('\n');
+    }
+
+    function renderMarkdownLive() {
+      const input = document.getElementById('md-source-input');
+      const visualOut = document.getElementById('md-visual-output');
+      const htmlOut = document.getElementById('md-html-output');
+      if (!input || !visualOut || !htmlOut) return;
+
+      const converted = parseMarkdownToHtml(input.value);
+      visualOut.innerHTML = converted || `<p style="color: var(--on-surface-variant);">請在左側輸入 Markdown 語法…</p>`;
+      htmlOut.textContent = converted;
+    }
+
+    function loadMarkdownPreset(key) {
+      const input = document.getElementById('md-source-input');
+      if (!input || !mdPresets[key]) return;
+      input.value = mdPresets[key];
+      renderMarkdownLive();
+    }
+
+    function setMdOutputMode(mode) {
+      mdOutputMode = mode;
+      const visualOut = document.getElementById('md-visual-output');
+      const htmlOut = document.getElementById('md-html-output');
+      const btnVis = document.getElementById('md-tab-visual');
+      const btnHtml = document.getElementById('md-tab-html');
+      if (!visualOut || !htmlOut) return;
+
+      if (mode === 'visual') {
+        visualOut.style.display = 'grid';
+        htmlOut.style.display = 'none';
+        if (btnVis) btnVis.classList.add('btn-primary');
+        if (btnHtml) btnHtml.classList.remove('btn-primary');
+      } else {
+        visualOut.style.display = 'none';
+        htmlOut.style.display = 'block';
+        if (btnVis) btnVis.classList.remove('btn-primary');
+        if (btnHtml) btnHtml.classList.add('btn-primary');
+      }
+    }
+
+    /* ============================================================
+       UNIT 5: Syntax & Relative Path Auto Linter
+    ============================================================ */
+    const lintSamples = {
+      broken_path: `<section class="slide">\n  <h2>教學簡報範例</h2>\n  <img src="C:\\Users\\student\\Desktop\\assets\\sticker.png" alt="">\n  <p>說明文字內容</p>\n</section>`,
+      localhost_leak: `<section class="slide">\n  <h2>作業連結</h2>\n  <a href="localhost:8000/notes.html">本機預覽連結</a>\n  <p>忘記關閉段落標籤\n</section>`,
+      clean: `<section class="slide">\n  <h2>標準可發布簡報</h2>\n  <img src="./assets/sticker.png" alt="課程重點示意貼圖">\n  <p>所有資源皆使用相對路徑，標籤成對閉合。</p>\n</section>`
+    };
+
+    function loadLintSample(key) {
+      const textarea = document.getElementById('lint-code-input');
+      if (!textarea || !lintSamples[key]) return;
+      textarea.value = lintSamples[key];
+      runAutoLinter();
+    }
+
+    function runAutoLinter() {
+      const textarea = document.getElementById('lint-code-input');
+      const output = document.getElementById('lint-report-output');
+      if (!textarea || !output) return;
+
+      const code = textarea.value;
+      const findings = [];
+
+      // 1. Absolute local path check
+      if (/[A-Za-z]:\\|\/Users\/|file:\/\//i.test(code)) {
+        findings.push({
+          sev: `sev-error`,
+          code: `ERROR · ABSOLUTE_LOCAL_PATH`,
+          title: `偵測到本機絕對路徑，圖片在他人電腦一定破圖`,
+          detail: `請改為相對於 index.html 的路徑格式，例如 ./assets/sticker.png。`
+        });
+      }
+
+      // 2. Localhost / 127.0.0.1 preview link check
+      if (/localhost|127\.0\.0\.1/i.test(code)) {
+        findings.push({
+          sev: `sev-error`,
+          code: `ERROR · LOCALHOST_URL`,
+          title: `偵測到本機預覽網址（localhost / 127.0.0.1）`,
+          detail: `本機測試連結只有你的電腦打得開，繳交前請改用相對路徑或已部署的 GitHub Pages 網址。`
+        });
+      }
+
+      // 3. Unclosed <p> or <section> tag check
+      const openP = (code.match(/<p[\s>]/gi) || []).length;
+      const closeP = (code.match(/<\/p>/gi) || []).length;
+      if (openP !== closeP) {
+        findings.push({
+          sev: `sev-error`,
+          code: `ERROR · UNCLOSED_TAG`,
+          title: `HTML 段落標籤 <p> 與 </p> 數量不對稱（${openP} vs ${closeP}）`,
+          detail: `未閉合的標籤會導致後續版面錯亂，請補齊 </p> 結尾標籤。`
+        });
+      }
+
+      // 4. Empty alt attribute on <img>
+      if (/<img[^>]*alt=["']\s*["']/i.test(code)) {
+        findings.push({
+          sev: `sev-warn`,
+          code: `WARN · EMPTY_ALT_TEXT`,
+          title: `圖片標籤缺少有意義的 alt 替代文字`,
+          detail: `建議補充圖片說明（如 alt="講義示意貼圖"），提升無障礙閱讀體驗並幫助檢核。`
+        });
+      }
+
+      // 5. Relative path prefix recommendation
+      if (/<img[^>]*src=["'](?!\.\/|data:)/i.test(code) && !/[A-Za-z]:\\|\/Users\//i.test(code)) {
+        findings.push({
+          sev: `sev-warn`,
+          code: `WARN · IMPLICIT_PATH`,
+          title: `圖片路徑建議明確加上 ./ 相對前綴`,
+          detail: `明確寫作 ./assets/... 可避免不同層級資料夾解析混淆。`
+        });
+      }
+
+      if (findings.length === 0) {
+        findings.push({
+          sev: `sev-pass`,
+          code: `PASS · ALL_CHECKS_GREEN`,
+          title: `檢查通過！語法對稱且相對路徑規格正確`,
+          detail: `這份 HTML 片段已符合 GitHub Pages 靜態部署與專案憲法標準，可以安心交付。`
+        });
+      }
+
+      output.innerHTML = findings.map((item) => `
+        <div class="lint-item ${item.sev}">
+          <div class="lint-header">
+            <span>${item.title}</span>
+            <span class="lint-code">${item.code}</span>
+          </div>
+          <div style="font-size: 0.875rem;">${item.detail}</div>
+        </div>
+      `).join('');
+    }
+
+    function autoFixLintSample() {
+      const textarea = document.getElementById('lint-code-input');
+      if (!textarea) return;
+
+      let fixed = textarea.value;
+      fixed = fixed.replace(/[A-Za-z]:\\[^"']*assets\\([^"']+)/gi, `./assets/$1`);
+      fixed = fixed.replace(/\/Users\/[^"']*assets\/([^"']+)/gi, `./assets/$1`);
+      fixed = fixed.replace(/localhost:\d+\/([^"']+)/gi, `./$1`);
+      fixed = fixed.replace(/127\.0\.0\.1:\d+\/([^"']+)/gi, `./$1`);
+      fixed = fixed.replace(/alt=["']\s*["']/gi, `alt="自動補齊的教學貼圖說明"`);
+
+      const openP = (fixed.match(/<p[\s>]/gi) || []).length;
+      const closeP = (fixed.match(/<\/p>/gi) || []).length;
+      if (openP > closeP) {
+        fixed = fixed.replace(/<\/section>/i, `</p>\n</section>`);
+      }
+
+      textarea.value = fixed;
+      runAutoLinter();
+    }
+
+    /* Initialize All Components */
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+      goToSlide(0);
+      updateMiniSlideView();
+      renderWorkflowDiagram();
+      renderMarkdownLive();
+      runAutoLinter();
+    });
+  </script>
+</body>
+</html>
